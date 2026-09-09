@@ -1,0 +1,751 @@
+/* ============================================================
+   Landing page ("/") — the Cluely-derived system.
+   ============================================================
+
+   Everything here is scoped under `.lp`, the wrapper the home page
+   renders, so /experience, /projects and the footer keep the warm
+   editorial palette in globals.css untouched.
+
+   ---------- What was taken from the reference ----------
+
+   1. One grotesque, end to end. SF Pro Display at the top of the
+      stack, Inter behind it for everything that isn't an Apple
+      device. No serif, no mono - the reference holds hierarchy with
+      size, weight and colour alone, and mixing three faces into it
+      would undo exactly the thing being copied.
+
+   2. Negative tracking that scales with size. The reference's 60px
+      headings sit near -0.035em and its 17px body sits at 0; the
+      curve between them is what makes the large type read as one
+      face rather than a blown-up version of the small type. Each
+      step below names its own letter-spacing for that reason - a
+      single value applied everywhere is the tell of a copy.
+
+   3. Weight 500-600, never 700+. Headlines are medium-to-semibold
+      and dark (#0b0b0f), not black and heavy. The `font-synthesis:
+      none` below matters here: without it a browser missing the
+      600 weight smears the 500 and the tracking stops holding.
+
+   4. Cards over rules. A 24px radius, a hairline, and a surface a
+      shade off white - with exactly one saturated blue card per
+      pair to carry the eye.
+   ============================================================ */
+/* ---------- Why this whole file sits in `@layer components` ----------
+
+   Layer order beats specificity, and Tailwind declares
+   `theme, base, components, utilities` in that order. Living in
+   `components` therefore puts this system:
+
+     - above `base`, so it overrides the `h1, h2, h3, h4 {
+       font-family: var(--font-serif) }` rule in globals.css without
+       an !important anywhere; and
+     - below `utilities`, so a `mt-6` or `mx-auto` in the markup still
+       wins over the `margin: 0` these classes set.
+
+   That second half is not a nicety. Unlayered, a `margin: 0` set in
+   this file silently swallowed the `mt-6` under the name in the hero.
+   ---------------------------------------------------------------- */
+
+@layer components {
+  .lp {
+    /* ---------- Type ---------- */
+    --lp-display:
+      "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI Variable",
+      system-ui, sans-serif;
+    --lp-text:
+      "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      system-ui, sans-serif;
+
+    /* ---------- Ink ----------
+       Cool near-black, not the warm #1c1a17 the rest of the site uses:
+       these sit on pure white, and the warm ink reads as faded against
+       it. `ink-2` is the bold lead-in inside body copy; `muted` is the
+       body itself and clears 5.6:1 on white; `faint` is decoration
+       only and never carries a word that matters. */
+    --lp-ink: #0b0b0f;
+    --lp-ink-2: #24262d;
+    --lp-muted: #61656f;
+    --lp-faint: #9ba0aa;
+
+    /* ---------- Ground ---------- */
+    --lp-bg: var(--color-paper);
+    --lp-surface: #f5f6f8;
+    --lp-surface-2: #eef0f4;
+    --lp-line: #e8eaee;
+    --lp-line-2: #d8dbe2;
+
+    /* ---------- Blue ----------
+       One saturated note: the primary button, the gradient card, the
+       inline chips. `blue-ink` is the same hue dark enough to set text
+       on white (7.1:1) - the button blue itself is not. */
+    --lp-blue: #2f6bf0;
+    --lp-blue-deep: #1d54d1;
+    --lp-blue-ink: #1b4fc4;
+    --lp-blue-wash: #eef3fe;
+
+    /* Long ease-out, matched to --ease-authored so the reveals in
+       motion.jsx and the hovers here settle on the same curve. */
+    --lp-ease: cubic-bezier(0.2, 0.65, 0.25, 1);
+    --lp-radius: 24px;
+
+    background: var(--lp-bg);
+    color: var(--lp-ink);
+    font-family: var(--lp-text);
+    font-size: 17px;
+    line-height: 1.6;
+    letter-spacing: -0.006em;
+    /* No faux bold, no faux italic. SF Pro ships every weight used
+       here; if it is missing, Inter is asked for the real weight
+       rather than a browser smearing the one it has. */
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* The page is white to the edges, so the warm paper behind it has to
+     go for the length of the landing route and come back everywhere
+     else. Two selectors for one job: `:has()` covers every current
+     browser without JS, and `.lp-ground` is added by LandingBody.jsx so
+     the paint also survives where `:has()` doesn't and, more usefully,
+     is torn down on unmount rather than a frame after a client-side
+     navigation away. It is deliberately not `.lp-body`: that is the body
+     *copy* class below, and putting it on <body> handed the element a
+     paragraph's font-size and a `var(--lp-muted)` that resolves to
+     nothing outside `.lp`.
+
+     The rule itself is at the foot of this file, outside the layer, for the
+     reason given there. */
+  .lp *,
+  .lp *::before,
+  .lp *::after {
+    /* Every family declared anywhere in globals.css - font-serif on
+       headings, font-mono on .rail/.eyebrow/.meta - is overridden by
+       one inherit, because this system is a single face by design. */
+    font-family: inherit;
+  }
+
+  /* ============================================================
+     Shell
+     ============================================================ */
+
+  /* 1160px of content in a 1400px window is the reference's measure:
+     wide enough for three cards at a comfortable 24px gutter, narrow
+     enough that a full-bleed heading still reads as a line rather
+     than a banner. */
+  .lp-wrap {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1160px;
+    padding-inline: 24px;
+  }
+
+  /* Let the featured pair become the wide visual moment on large screens:
+     exactly 10vw of breathing room on either side. Below that threshold the
+     standard wrapper is wider and therefore remains the better fit. */
+  @media (width >= 90rem) {
+    .lp-wrap--featured {
+      width: 80vw;
+      max-width: none;
+      padding-inline: 0;
+    }
+  }
+
+  /* Sections are held apart by space, not by rules. 128px is the
+     reference's rhythm at desktop; it collapses to 80px on a phone,
+     where the same gap reads as a missing screen. */
+  .lp-section {
+    padding-block: 80px;
+  }
+
+  @media (width >= 48rem) {
+    .lp-section {
+      padding-block: 128px;
+    }
+  }
+
+  .lp-section--tight {
+    padding-block: 64px;
+  }
+
+  @media (width >= 48rem) {
+    .lp-section--tight {
+      padding-block: 96px;
+    }
+  }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+
+  /* Keep the hero on the shared paper ground used by every other route. */
+
+  /* The glyph plate on a fact card and above each About column. A
+     squircle rather than a circle, at the radius the cards use scaled
+     down, so one shape language runs from the 24px card to the 10px
+     mark inside it. */
+
+  
+
+  
+
+  /* Cards used as blocks rather than links still stack their children,
+     and `.lp-card` is already a column flex, so the icon needs pinning
+     to its own width or it stretches the full card. */
+
+  /* ============================================================
+     Tech grid
+     ============================================================ */
+
+  /* ============================================================
+     Type scale
+     ============================================================
+
+     Five steps, each with its own tracking. The values are not
+     decorative: at 76px, -0.038em closes the gaps SF Pro Display opens
+     at display sizes, and the same figure applied to the 17px body
+     would jam the words together. Tracking loosens as size falls and
+     crosses zero at the eyebrow, where caps need air instead. */
+
+  
+
+  .lp-h3 {
+    font-family: var(--lp-display);
+    font-size: clamp(1.375rem, 2.2vw, 1.625rem);
+    font-weight: 600;
+    letter-spacing: -0.026em;
+    line-height: 1.22;
+    color: var(--lp-ink);
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  /* The subtitle under a section heading. Muted and regular weight -
+     in the reference it never competes, it only explains. */
+
+  .lp-body {
+    font-size: 1.0625rem;
+    letter-spacing: -0.008em;
+    line-height: 1.52;
+    color: var(--lp-muted);
+    text-wrap: pretty;
+    margin: 0;
+  }
+
+  /* The reference's card copy pattern: a bold clause naming the thing,
+     then the explanation in the same size and colour as ordinary body
+     text, running on in the same paragraph. Read as one sentence, not
+     as a heading with a caption under it. */
+
+  /* Positive tracking, because caps at 11px need it in the exact
+     proportion that display sizes need the opposite. */
+  .lp-eyebrow {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.145em;
+    text-transform: uppercase;
+    color: var(--lp-faint);
+    margin: 0;
+  }
+
+  /* ============================================================
+     Section headers
+     ============================================================ */
+
+  /* Widths in `rem`, deliberately, not `ch`.
+
+     `ch` is the width of a "0" in *this* element's font, and this element
+     inherits the 17px body size - so a `34ch` cap here was ~290px and had
+     nothing to do with the 56px heading it was supposed to be measuring.
+     The big left-hand headings were breaking at a width nobody chose.
+
+     34rem holds a left heading to two lines at the top of the clamp and
+     one line when it is short, which is the reference's rhythm; 46rem is
+     the centred variant, wide enough that the subtitle under it settles
+     on two lines rather than three short ones. */
+
+  
+
+  /* ============================================================
+     Chips and pills
+     ============================================================ */
+
+  /* The status chip above the name. A live dot, a hairline, and a
+     surface a shade off white. */
+
+  
+
+  @keyframes lp-pulse {
+    0% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+
+  /* The inline pill the reference sets *inside* a heading - "Cluely
+     [listens] in to the conversation". Sized in `em` so it tracks the
+     heading it sits in rather than needing a value per context. */
+  /* Every value is in `em` so one rule serves a 56px heading and a 17px
+     line alike - but they have to be the *small* values the reference
+     uses. At 0.3em gap and 0.42em side padding this pill measured 17px
+     and 24px inside the 56px section heading, which is a button, not an
+     emphasis. Snug enough that the word still reads as part of the
+     sentence is the whole effect. */
+
+  
+
+  /* A plain tag, used for the tech runs. */
+
+  
+
+  /* ============================================================
+     Buttons
+     ============================================================ */
+
+  .lp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    border-radius: 999px;
+    padding: 0 22px;
+    font-size: 0.9375rem;
+    font-weight: 590;
+    letter-spacing: -0.012em;
+    white-space: nowrap;
+    transition:
+      background-color 220ms var(--lp-ease),
+      border-color 220ms var(--lp-ease),
+      box-shadow 320ms var(--lp-ease);
+  }
+
+  .lp-btn svg {
+    width: 15px;
+    height: 15px;
+    flex: none;
+  }
+
+  /* The reference's primary sits on a blue bloom rather than a drop
+     shadow: a wide, very soft, heavily tinted spread under the pill,
+     which reads as light coming off it instead of the pill casting a
+     shadow onto the page. */
+  .lp-btn--primary {
+    background: var(--lp-blue);
+    color: #fff;
+    box-shadow:
+      0 1px 2px rgb(29 84 209 / 0.28),
+      0 10px 26px -8px rgb(47 107 240 / 0.55);
+  }
+
+  @media (hover: hover) {
+    .lp-btn--primary:hover {
+      background: var(--lp-blue-deep);
+      box-shadow:
+        0 1px 2px rgb(29 84 209 / 0.3),
+        0 16px 34px -8px rgb(47 107 240 / 0.62);
+    }
+  }
+
+  .lp-btn--primary:active {
+    transform: translateY(0);
+  }
+
+  
+
+  /* A text link that keeps the arrow with the words. The arrow slides
+     on hover and the words don't, so the row doesn't reflow. */
+  .lp-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9375rem;
+    font-weight: 550;
+    letter-spacing: -0.01em;
+    color: var(--lp-blue-ink);
+    transition: color 200ms var(--lp-ease);
+  }
+
+  .lp-link svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    transition: transform 260ms var(--lp-ease);
+  }
+
+  @media (hover: hover) {
+    .lp-link:hover svg {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ============================================================
+     Cards
+     ============================================================ */
+
+  .lp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--lp-radius);
+    border: 1px solid var(--lp-line);
+    background: var(--lp-surface);
+    padding: 28px;
+    overflow: hidden;
+    transition:
+      box-shadow 380ms var(--lp-ease),
+      border-color 380ms var(--lp-ease);
+  }
+
+  @media (width >= 48rem) {
+    .lp-card {
+      padding: 32px;
+    }
+  }
+
+  /* The one saturated card in the pair uses the supplied cornflower swatch
+     as a flat field, keeping its content contrast and inset edge highlight. */
+  .lp-card--blue {
+    border-color: transparent;
+    background: #6e98f4;
+    color: #fff;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.28),
+      0 20px 44px -26px rgb(47 107 240 / 0.7);
+  }
+
+  .lp-card--blue .lp-h3,
+  .lp-card--blue .lp-eyebrow {
+    color: #fff;
+  }
+
+  .lp-card--blue .lp-body {
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  
+
+  /* The mock UI panel the reference floats inside its cards - a dark
+     plate with a soft lift, cropped by the card's own radius. */
+  .lp-plate {
+    border-radius: 14px;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    background: rgb(255 255 255 / 0.14);
+    padding: 14px;
+    backdrop-filter: blur(6px);
+  }
+
+  /* ============================================================
+     Row list (experience) — the reference's FAQ pattern
+     ============================================================
+
+     Full-bleed rows on hairlines, no card, no left rail. The tint on
+     hover is a pseudo-element bleeding 16px past each edge so the
+     hairlines stay in one column while the highlight has padding. */
+
+  /* `isolation: isolate` is load-bearing, not tidiness.
+
+     The hover tint below is a `z-index: -1` pseudo-element, which paints
+     behind its own parent's background and keeps going up the tree until
+     it meets a stacking context. `.lp` paints the page white, so without
+     a context between the two the tint lands *behind* that white and is
+     simply never seen.
+
+     It did appear to work, which is worse than not working: each row's
+     `StaggerItem` wrapper carries an inline opacity for the scroll
+     reveal, and an opacity below 1 is itself a stacking context - so the
+     tint was visible for exactly the 620ms the reveal was in flight and
+     invisible from then on. Pinning the context here makes it a property
+     of the list rather than of whether an animation happens to be
+     running. */
+
+  .lp-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    align-items: baseline;
+    border-bottom: 1px solid var(--lp-line);
+    padding-block: 22px;
+    transition: border-color 260ms var(--lp-ease);
+  }
+
+  @media (width >= 48rem) {
+    .lp-row {
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      padding-block: 26px;
+    }
+  }
+
+  /* One tint for both row systems: the FAQ question below is the same row on
+     the same hairline, so it takes the same pseudo-element rather than a copy
+     of it. */
+  .lp-row::before {
+    content: "";
+    position: absolute;
+    inset: 0 -16px;
+    border-radius: 12px;
+    background: var(--lp-surface);
+    opacity: 0;
+    transition: opacity 260ms var(--lp-ease);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @media (hover: hover) {
+    .lp-row:hover::before {
+      opacity: 1;
+    }
+  }
+
+  .lp-row:focus-visible::before {
+    opacity: 1;
+  }
+
+  /* Likewise the type: the FAQ question is this title's scale and weight to
+     the decimal, so it is this title. The FAQ adds `text-wrap: pretty` of its
+     own further down - questions are sentences and wrap, row titles are names
+     and mostly don't. */
+
+  
+
+  /* Tabular figures so a column of dates lines up on the digit rather
+     than on the widest glyph. */
+  .lp-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  .lp-row-arrow {
+    color: var(--lp-faint);
+    transition:
+      transform 300ms var(--lp-ease),
+      color 300ms var(--lp-ease);
+  }
+
+  .lp-row-arrow svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  @media (hover: hover) {
+    .lp-row:hover .lp-row-arrow {
+      color: var(--lp-blue);
+      transform: translateX(3px);
+    }
+  }
+
+  /* ============================================================
+     FAQ
+     ============================================================ */
+
+  /* The same row system as `.lp-rows` above, opened up.
+
+     Nothing here restates the type: the question is `.lp-row-title`'s
+     scale and weight to the decimal and the answer is `.lp-body`'s,
+     because the FAQ is the layout those two were derived from in the
+     first place. What it adds is the disclosure - a height transition,
+     a mark that turns over, and a tint that stays on the question
+     rather than spreading across the answer under it.
+
+     `isolation: isolate` for the same reason `.lp-rows` needs it: the
+     hover tint is a `z-index: -1` pseudo-element, and without a
+     stacking context here it paints behind `.lp`'s white page and is
+     never seen. */
+
+  
+
+  /* A button, so it answers to Space and Enter for free, but reset back
+     to a row: buttons arrive centred, mid-grey and clipped to their
+     text, and every one of those has to go before it can sit on a
+     hairline. */
+
+  
+
+  /* Sized and offset to sit on the question's first line rather than at
+     the top of the button box, which is a visible half-line out when a
+     question wraps to two. */
+
+  
+
+  
+
+  /* ---------- The disclosure itself ----------
+
+     `grid-template-rows: 0fr -> 1fr` is the whole animation. A grid row
+     sized in `fr` resolves against the content it holds, so the panel
+     can travel from nothing to its natural height without anyone
+     measuring that height first - which is the part `max-height` gets
+     wrong, since a guessed cap either clips a long answer or spends the
+     back half of the transition animating empty space.
+
+     340ms rather than the 260ms the rows hover at: this one covers real
+     distance, and at 260 it snaps.
+
+     `visibility` is stepped, not eased, and its delay only applies on
+     the way shut - so a collapsed answer is genuinely gone for find-in-
+     page, the tab order and a screen reader, while an opening one is
+     visible from the first frame. */
+
+  
+
+  /* `min-height: 0` is what lets the 0fr row actually reach zero - a
+     grid item's automatic minimum size is its content otherwise, and
+     the panel would sit permanently open at full height. */
+
+  /* ---------- Why there is no fade on the copy ----------
+
+     The answer is meant to read as something that was already there,
+     tucked up behind its question and slid out from under it - not as
+     text that materialises in a box. Those are different animations and
+     only one of them survives an opacity ramp: things that are hidden
+     behind other things don't go translucent on their way out, they get
+     uncovered.
+
+     So the panel above is the mask and this is the sheet moving behind
+     it. Two motions, deliberately not the same distance: the mask opens
+     the full height of the answer while the sheet only travels 16px, so
+     the first line is still emerging from under the question when the
+     row below has finished getting out of the way. Matching them would
+     pin the text to the mask's top edge and the whole thing would read
+     as a box growing, which is the effect this is avoiding.
+
+     Same 340ms and the same easing as the mask, and no delay - the two
+     have to start on the same frame or the copy visibly sets off after
+     the row it is supposed to be hiding under. */
+
+  
+
+  /* ============================================================
+     Contact panel
+     ============================================================ */
+
+  /* The reference closes on a soft wash rather than another white
+     band, so the page has somewhere to land. */
+  .lp-panel {
+    position: relative;
+    border-radius: 32px;
+    border: 1px solid var(--lp-line);
+    background:
+      radial-gradient(
+        120% 140% at 50% -30%,
+        var(--lp-blue-wash) 0%,
+        transparent 62%
+      ),
+      var(--lp-surface);
+    padding: 56px 28px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  @media (width >= 48rem) {
+    .lp-panel {
+      padding: 80px 56px;
+    }
+  }
+
+  /* Copy-email control: monospace would break the single-face rule,
+     so the address is held apart by a hairline box and tabular
+     figures instead. */
+  .lp-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    min-height: 46px;
+    border: 1px solid var(--lp-line-2);
+    border-radius: 999px;
+    background: var(--lp-bg);
+    padding: 0 8px 0 18px;
+    font-size: 0.9375rem;
+    letter-spacing: -0.008em;
+    color: var(--lp-ink);
+    transition:
+      border-color 220ms var(--lp-ease),
+      box-shadow 220ms var(--lp-ease);
+  }
+
+  @media (hover: hover) {
+    .lp-copy:hover {
+      border-color: var(--lp-blue);
+      box-shadow: 0 0 0 4px var(--lp-blue-wash);
+    }
+  }
+
+  .lp-copy__text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lp-copy__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--lp-surface);
+    color: var(--lp-muted);
+  }
+
+  .lp-copy__icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ============================================================
+     Focus
+     ============================================================ */
+
+  /* Blue rather than the site's warm accent, and rounded to the pill
+     and card radii it has to sit around. */
+  .lp :focus-visible {
+    outline: 2px solid var(--lp-blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .lp .lp-btn:focus-visible,
+  .lp .lp-copy:focus-visible {
+    border-radius: 999px;
+  }
+
+  .lp .lp-card:focus-visible {
+    border-radius: var(--lp-radius);
+  }
+
+  /* ============================================================
+     Selection
+     ============================================================ */
+
+  .lp ::selection {
+    background: #cfe0ff;
+    color: var(--lp-ink);
+  }
+}
+
+/* ----------------------------------------------------------------
+   Outside `@layer components`, alone in this file, and it has to be.
+
+   <body> carries the `bg-paper` utility from layout.js. Everything in the
+   layer above loses to a utility by design - that is the whole reason this
+   file is layered - but this one rule exists precisely to beat `bg-paper`
+   for the length of the landing route, and inside the layer it never did:
+   the landing page has been sitting on warm paper, with LandingBody.jsx
+   adding a class that changed nothing. Unlayered beats layered outright, so
+   the ground goes here and the rest of the file stays where it belongs.
+   ---------------------------------------------------------------- */
+body:has(.lp),
+body.lp-ground {
+  background-color: var(--color-paper);
+}

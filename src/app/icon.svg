@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Wordmark initial on the site's own ink, not a repurposed stock glyph.
+       Drawn as filled shapes rather than strokes, and sized to fill the tile:
+       a 3px stroke on this grid is under 1.5px once a browser scales the
+       favicon to 16, where it antialiases into a blob that reads as a leaf.
+       Solid shapes survive that downsample; the arms meet the stem with no
+       gap for the same reason. Squared terminals to match the site. -->
+  <rect width="32" height="32" rx="6" fill="#1c1a17" />
+  <path
+    d="M7 6h4.5v20H7z M19 6h6.5l-7.5 10h-6.5z M11.5 16H18l7.5 10H19z"
+    fill="#faf9f7"
+  />
+</svg>

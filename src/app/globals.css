@@ -1,0 +1,1046 @@
+@import "tailwindcss";
+@import "./landing.css";
+@import "./home.css";
+@import "./apple-home.css";
+
+/* ============================================================
+   Kevin Mei, editorial.
+   Warm paper, hairline rules, a narrow rail against a wide
+   column. No cards, no gradients, no containing boxes.
+   Typography uses the SF Pro/system stack throughout.
+   ============================================================ */
+
+@theme {
+  /* A chosen off-white, not #fff. Everything else is tuned warm against it;
+     cool greys read as dirt on this ground. */
+  --color-paper: #faf9f7;
+  --color-paper-2: #f3f1ec;
+  --color-surface: #f3f1ec;
+
+  /* `faint` carries real content, so it clears 4.5:1 on paper (measures
+     4.86:1). Rails are held apart by size and face, not by being washed out. */
+  --color-ink: #1c1a17;
+  --color-ink-2: #6b665e;
+  --color-faint: #736d65;
+
+  /* The one saturated note, used sparingly. */
+  --color-brand: #b0344f;
+  --color-accent: #b0344f;
+  --color-accent-deep: #8d283d;
+
+  /* Link */
+  --color-link: #3a5f8a;
+
+  /* Hairlines: warm, barely there. */
+  --color-line: #e2ded4;
+  --color-line-2: #cfc9bc;
+
+  /* Type */
+  --font-serif: "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* One curve everywhere. A long, low-slung ease-out: quick to commit, slow
+     to settle. */
+  --ease-authored: cubic-bezier(0.2, 0.65, 0.25, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    /* The top bar is fixed - the page has to run under the glass for the
+       glass to be doing anything - so the height it no longer takes in flow
+       is bought back here. 12 + 54 + 12 of bar, rounded up to leave the first
+       line on a page a little air rather than landing it exactly on the
+       bar's lower edge. Section anchors carry `scroll-mt-24`, which already
+       clears this. */
+    padding-top: 5.25rem;
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    color: var(--color-ink);
+  }
+
+  /* Warm accent selection rather than the browser's blue. */
+  ::selection {
+    background: #f0d7cf;
+    color: var(--color-ink);
+  }
+
+  /* A ring that sits off the text in the accent, squared to match the
+     rest of the page rather than following a pill radius. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  a,
+  button {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .page-title-gradient {
+    color: #06263b;
+    width: fit-content;
+    max-width: 100%;
+    letter-spacing: calc(-0.015em + 1px);
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+    .page-title-gradient {
+      background-image: linear-gradient(100deg, #06263b 0%, #4e718c 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  /* Mono eyebrow / section label */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  /* Outline tags for a project's stack. Hairline boxes, no fill, so they
+     don't read as chips on a card. Type matches `.eyebrow` — same mono,
+     weight, tracking and caps — a hair smaller so the boxed names don't
+     shout as loud as the section label above them. */
+  .tech {
+    display: inline-block;
+    border: 1px solid var(--color-line-2);
+    padding: 0.2rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  /* Metadata in light mono, a run of plain text separated by middots rather
+     than pill badges. */
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: var(--color-ink-2);
+  }
+
+  /* Org names on experience rows: same face as `.meta`, a step larger so
+     the company line is readable under the role without crowding the
+     description below it. */
+  .exp-org {
+    font-size: 0.85rem;
+  }
+
+  /* About tools list: same mono index as the rail labels beside it, capped
+     so FRONTEND and REACT read as one system. */
+  .tool-run {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  /* Tabular figures and flush right from md up, so the column lands on one
+     hard edge against the gutter. */
+  .rail {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: 0.02em;
+    color: var(--color-faint);
+    white-space: nowrap;
+  }
+
+  @media (width >= 48rem) {
+    .rail {
+      text-align: right;
+    }
+  }
+
+  /* A fixed dock floats over whatever is last on the page, which at the end
+     of a scroll is the footer's copyright line. `:has()` buys the room back
+     only on pages that actually carry a dock, so the other three keep their
+     footer exactly as it is. */
+  body:has(.dock) footer {
+    padding-bottom: 6.5rem;
+  }
+
+  /* ---------- Section dock ----------
+     The floating index on /experience. The glass is lifted wholesale from
+     phishprobe's composer bar (src/phishprobe/web/static/app.css): a bevel-lit
+     border, a gradient lens for the tint, a second layer for the catch light,
+     and the same 32px radius. Two things carried over that are easy to lose:
+
+     - The shadow lives on the stage, not the glass, and it is a box-shadow
+       rather than filter: drop-shadow. A filter on an ancestor opens a new
+       backdrop root, and anything sampling a backdrop inside it then samples
+       this element - which is transparent - instead of the page.
+     - The lens is clipped by border-radius alone. overflow: hidden would
+       composite it against a grey plate. */
+  .dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    padding: 12px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+    pointer-events: none;
+  }
+
+  .dock-stage {
+    pointer-events: auto;
+    width: max-content;
+    max-width: calc(100vw - 2.5rem);
+    margin: 0 auto;
+    border-radius: 32px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  }
+
+  .dock-glass {
+    position: relative;
+    display: block;
+    padding: 5px;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      /* an offset inset with a negative spread lights one corner the way a
+         bevel catches light, rather than ringing the whole edge */
+      inset 6px 6px 0 -6px rgba(255, 255, 255, 0.62),
+      /* soft inner glow along the rim */
+      inset 0 0 10px 1px rgba(255, 255, 255, 0.26),
+      /* the lit top face - the strongest single cue that this has a surface */
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.34),
+      /* the dark return beneath it, which is what gives the pane thickness */
+      inset 0 -7px 12px -7px rgba(0, 0, 0, 0.38);
+  }
+
+  /* A gradient, not a flat tint: glass catches light from above and sits in
+     its own shadow below, and that fall-off is what stops the pane reading as
+     a painted rectangle. */
+  .dock-glass__lens {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Darker than the bar this was lifted from, and for a measurable reason:
+       at the original 0.27/0.38/0.47 the pane composited to rgb(162,162,160)
+       over paper, and white text on that tops out at 2.56:1 - under the 4.5:1
+       AA wants for text this size, with no headroom left, since the labels
+       were already pure white. Contrast here is a property of the glass, not
+       of the type. */
+    background: linear-gradient(
+      180deg,
+      rgba(12, 12, 13, 0.5) 0%,
+      rgba(12, 12, 13, 0.6) 55%,
+      rgba(12, 12, 13, 0.68) 100%
+    );
+  }
+
+  /* Extra top-down catch light, no fill of its own. */
+  .dock-glass__light {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      /* sky: the bright band across the top face */
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.05) 20%,
+        transparent 46%
+      ),
+      /* ground bounce: always weaker and shorter than the sky above it */
+      linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0%, transparent 15%);
+  }
+
+  /* Five words don't fit a phone, and the alternative was 8px type. The row
+     scrolls instead. The scroller is a wrapper rather than the row itself:
+     the row has to stay `width: max-content` for the equal-width trick below
+     to size from content, and an element that wide never overflows itself.
+     No scrollbar - the dock is 44px tall and a bar would eat a fifth of it;
+     the component keeps the current section scrolled into view instead. */
+  .dock-scroll {
+    position: relative;
+    z-index: 4;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .dock-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dock-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The capsule that follows the pointer. Transform and width rather than
+     `left`, so the slide never lays the row out again; the element is
+     absolute, so animating its width moves nothing else either. Both come
+     from measuring the target item - labels run from "Work" to
+     "Certification" and no arithmetic on an index would find their edges. */
+  .dock-capsule {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.14);
+    /* Placed by the component, never by React's render: a drag writes this
+       node's transform directly, every frame, and a style prop would fight
+       it. Invisible until the first placement so it can't flash at 0. */
+    opacity: 0;
+    transition:
+      transform 0.34s var(--ease-authored),
+      width 0.34s var(--ease-authored);
+    pointer-events: none;
+  }
+  /* A square puck by default; the section in play grows to take its name.
+     Padding rather than a width, so the box is whatever its contents need. */
+  .dock-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.75rem;
+    padding-inline: 0.72rem;
+    /* 0.72 put the unselected names at 2.0:1. They carry the same weight of
+       meaning as the selected one - they are where you can go - so they are
+       held apart by the capsule and the glyph's brightness, not by being
+       harder to read. 0.93 rather than a round 0.9 because 0.88 measured
+       4.47:1 - close enough to look fine and still a fail. */
+    color: rgba(255, 255, 255, 0.93);
+    /* Both docks are chrome, not page furniture, so they are set in the bar's
+       own face rather than the mono the page labels itself with. Sentence
+       case and tight, because uppercase at 0.1em is a monospace idiom - run
+       any typeface through it and it reads as a label instead of as itself,
+       which is what made this look unchanged the first time the family was
+       swapped. */
+    font-family:
+      -apple-system, system-ui, BlinkMacSystemFont, var(--font-inter),
+      sans-serif;
+    font-size: 0.86rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    transition: color 0.2s var(--ease-authored);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dock-item svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  /* Clipped to nothing rather than removed: the name is the button's
+     accessible name, and one that only exists sometimes is not one. The
+     grid track is what animates - 0fr to 1fr is how you get a transition to
+     a width the content decides. */
+  .dock-item__name {
+    display: grid;
+    grid-template-columns: 0fr;
+    margin-left: 0;
+    opacity: 0;
+    transition:
+      grid-template-columns 0.32s var(--ease-authored),
+      margin-left 0.32s var(--ease-authored),
+      opacity 0.22s var(--ease-authored);
+  }
+  .dock-item__name > span {
+    overflow: hidden;
+  }
+  .dock-item[data-current="true"] .dock-item__name {
+    grid-template-columns: 1fr;
+    margin-left: 0.42rem;
+    opacity: 1;
+  }
+  /* `data-current` is the section the pointer is on, which is not always the
+     one the page is in. A phone has no :hover to bleach the label, so the
+     named button has to take the light colour itself. */
+  .dock-item[data-current="true"],
+  .dock-item[aria-current="true"],
+  .dock-item[aria-current="page"],
+  .dock-item:active {
+    color: #fff;
+  }
+  .dock-item:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+    border-radius: 26px;
+  }
+  @media (hover: hover) {
+    .dock-item:hover {
+      color: #fff;
+    }
+  }
+
+  /* Four pucks and one named button fit a phone as they are, so nothing here
+     shrinks any more - only the padding comes in, to keep the named one off
+     the ends of the glass. */
+  @media (width < 40rem) {
+    .dock-item {
+      padding-inline: 0.55rem;
+      font-size: 0.82rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dock-capsule {
+      transition: none;
+    }
+  }
+
+  /* ---------- Top bar ----------
+     The site index, in the section dock's glass and turned the other way up.
+     Everything visual here is borrowed outright - `.dock-glass` with its two
+     light layers, `.dock-row`, `.dock-capsule`, `.dock-item`, right down to
+     the capsule's easing - so the bar at the top and the dock at the bottom
+     can only ever be restyled together.
+
+     Three panes rather than one strip: the wordmark, the index, and the ways
+     to reach me are three different things, and glass wide enough to hold all
+     three stops reading as an object on the page and starts reading as a
+     header with a tint. The gaps between them belong to the page, which is
+     what `pointer-events` is doing on the container.
+
+     SF Pro first, the same stack the bar has carried since the type test -
+     `-apple-system` is the only sanctioned way to reach it, and Inter behind
+     it is drawn as a web-safe SF for everyone else. */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 12px 20px;
+    pointer-events: none;
+    font-family:
+      -apple-system, system-ui, BlinkMacSystemFont, var(--font-inter),
+      sans-serif;
+    /* Asymmetric, and the two halves live on different rules because a
+       transition is read from the state being moved *to*: this one governs
+       the return, `.topbar--away` below governs the leaving. */
+    transition: transform 0.75s var(--ease-authored);
+  }
+
+  /* Out through the top edge, plus enough to take the shadow with it. The
+     pieces keep their own pointer-events, so anything still catchable up
+     there has to actually leave rather than just turn invisible. */
+  .topbar--away {
+    transform: translateY(calc(-100% - 16px));
+    transition-duration: 0.6s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topbar {
+      transition: none;
+    }
+  }
+
+  /* A grid rather than space-between, because the index has to sit on the
+     centre of the viewport - the same centre the section dock sits on - and
+     space-between would hang it off whichever side is wider. The two 1fr
+     tracks are equal by construction, so the auto track between them is
+     centred whatever the wordmark or the circles are doing. */
+  .topbar-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.625rem;
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+  .topbar-inner > :first-child {
+    justify-self: start;
+  }
+  .topbar-inner > nav {
+    justify-self: center;
+  }
+  .topbar-inner > :last-child {
+    justify-self: end;
+  }
+
+  .topbar-side {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  /* One pane of glass. The shadow lives out here rather than on `.dock-glass`
+     for the same reason it lives on `.dock-stage` and not the dock's own
+     glass: a filter on an ancestor opens a new backdrop root, and anything
+     sampling a backdrop inside it samples that element instead of the page.
+
+     The radius is restated for :focus-visible because the base ring squares
+     every focused element to 1px, which would take the corners off a pane
+     the moment it was tabbed to. */
+  .topbar-piece {
+    pointer-events: auto;
+    flex: none;
+    border-radius: 32px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .topbar-piece:focus-visible {
+    border-radius: 32px;
+    outline-offset: 4px;
+  }
+
+  /* A circle is the same glass with the radius let out. Clamping does the
+     rest: 32px on a 54px box is already a circle, so the pane and the shadow
+     under it agree without either being told the size. */
+  .dock-glass--round {
+    border-radius: 999px;
+  }
+
+  .topbar-name {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    height: 2.75rem;
+    padding-inline: 1.1rem;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+  .topbar-name__short {
+    display: none;
+  }
+
+  /* The circles. Same puck as `.dock-item`, minus the name that expands out
+     of it - there is nothing to expand to, and a circle that grew into a
+     capsule would promise a menu it doesn't have. */
+  .topbar-icon {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    /* The same 0.93 the dock's names carry. At the 0.74 it was, the glyph sat
+       at about 2.1:1 on this glass - under the 3:1 a graphic needs to be
+       made out, and visibly dimmer than the labels beside it. */
+    color: rgba(255, 255, 255, 0.93);
+    transition: color 0.2s var(--ease-authored);
+  }
+  .topbar-icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+  .topbar-piece:active .topbar-icon {
+    color: #fff;
+  }
+  @media (hover: hover) {
+    .topbar-piece:hover .topbar-icon {
+      color: #fff;
+    }
+  }
+
+  /* ---------- Contact ----------
+     The index's own puck, one item wide, sitting in its own pane at the right
+     of the bar.
+
+     Everything the row at the centre does, this does, and by using its parts
+     rather than resembling them: `.dock-item` sets the glyph and the type,
+     `.dock-item__name` unfolds "Contact" at the same 48rem the destinations
+     unfold at, and `.dock-capsule` is the same light coming up underneath.
+     The one difference is that there is nowhere for the capsule to slide, so
+     it is placed in CSS rather than measured in JS - the full width of its
+     single item, fading in rather than travelling. A capsule that slid would
+     be promising a second item.
+
+     It is a pill and not a circle from 48rem up for the same reason: it says
+     what it is at the width where the destinations say what they are, and
+     folds back to the glyph on a phone, where the wordmark and the index are
+     already competing for the strip. */
+  .topbar-contact .dock-capsule {
+    width: 100%;
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease-authored);
+  }
+  .topbar-piece:active .topbar-contact .dock-capsule,
+  .topbar-piece:focus-visible .topbar-contact .dock-capsule {
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    .topbar-piece:hover .topbar-contact .dock-capsule {
+      opacity: 1;
+    }
+  }
+
+  /* Folded, this is the circle the mail glyph used to sit in and has to stay
+     one: 1.2rem of glyph plus 0.775rem a side is exactly the 2.75rem every
+     other piece of the bar is tall. Opened, the same padding holds the name
+     off the ends of the glass. Stated here rather than left to `.dock-item`
+     because the phone rule below pulls that in to 0.55rem, which would leave
+     a 37px circle where a 44px one belongs. */
+  .topbar-contact .dock-item {
+    padding-inline: 0.775rem;
+  }
+
+  /* The pane's shadow has to be cut to the pane. `.topbar-piece` assumes 32px
+     because everything it wrapped until now was a circle or a squarish pane;
+     once the name is open this is a 120px-wide pill, and a 32px shadow under
+     it shows at the ends. */
+  .topbar-piece--pill,
+  .topbar-piece--pill:focus-visible {
+    border-radius: 999px;
+  }
+
+  /* A phone has room for the initials, four glyphs, one open name and a
+     circle - but not for "Kevin Mei" as well. Both are in the markup and this
+     picks one; the link is labelled either way, so nothing is lost to a
+     screen reader. */
+  @media (width < 40rem) {
+    .topbar {
+      padding: 10px 12px;
+    }
+    .topbar-inner,
+    .topbar-side {
+      gap: 0.5rem;
+    }
+    .topbar-name {
+      width: 2.75rem;
+      padding-inline: 0;
+      justify-content: center;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+    }
+    .topbar-name__full {
+      display: none;
+    }
+    .topbar-name__short {
+      display: block;
+    }
+  }
+
+  /* ---------- Where the names are, and aren't ----------
+     One breakpoint decides both halves of this, and it is measured rather
+     than picked. It also governs the contact pane at the right, which unfolds
+     its own name on the same rule - so 48rem is the width at which every word
+     in the bar appears at once, and the bar is never half-lettered.
+
+     So: from 48rem up every destination is spelled out, and hovering only
+     slides the capsule. Below it the whole row folds back to glyphs - not the
+     current one either, because a phone is exactly where the wordmark and the
+     contact pane are competing for the same strip, and one open name is the
+     difference between fitting and not.
+
+     Folded means collapsed, never `display: none`. The name is the link's
+     accessible name and its glyph is aria-hidden, so a display rule here
+     would leave four links on every phone with nothing to announce. The grid
+     track goes to 0fr instead: no width, still in the tree.
+
+     The section dock is untouched by all of this - it keeps naming whichever
+     section is in play at every width, because it has the whole bottom of the
+     screen to itself. Sharing the top with two other panes is the entire
+     difference. */
+  @media (width >= 48rem) {
+    .topbar .dock-item__name {
+      grid-template-columns: 1fr;
+      margin-left: 0.42rem;
+      opacity: 1;
+    }
+  }
+  @media (width < 48rem) {
+    .topbar .dock-item[data-current="true"] .dock-item__name {
+      grid-template-columns: 0fr;
+      margin-left: 0;
+      opacity: 0;
+    }
+  }
+
+  /* TEST ONLY - SF Pro end to end on the pages that opt in (/experience and
+     /projects today; home is the `.lp` system in landing.css and the footer
+     is still editorial), Fraunces headings included, to see what one
+     grotesque does to a layout built on three typefaces. The descendant star
+     and !important are here because this has to beat `font-serif`,
+     `font-mono`, `.rail`, `.meta`, `.eyebrow` and `.tech`, all of which set a
+     family of their own - which is also why this is a test class on two pages
+     and not a change to the theme. Delete this block and the `.sf-test`
+     wrappers in experience/page.js and projects/page.js to go back. */
+  .sf-test,
+  .sf-test * {
+    font-family:
+      -apple-system,
+      system-ui,
+      BlinkMacSystemFont,
+      sans-serif !important;
+  }
+  /* ...except the labels. Two class names beat one, so these win the
+     !important fight above without needing anything louder.
+
+     `.rail` is the index columns - dates and categories - where mono is what
+     makes them read as an index rather than more prose: fixed advance widths,
+     tabular figures, and a texture the titles beside them don't share.
+     `.eyebrow` is the section heads, which do the same job one level up. A
+     label set in the same face as the thing it labels stops being a label.
+     `.tech` is the stack tags, which are the same label as TECHNOLOGIES
+     sitting in a box.
+     `.tool-run` is the About tools list, labels and names in the same
+     capped mono as those tags, without the boxes.
+
+     The descendant selectors are load-bearing, not belt and braces: a date
+     rail keeps its two lines in child spans, and `.sf-test *` above matches
+     those directly. Without `.rail *` the element is mono and the text inside
+     it isn't. */
+  .sf-test .rail,
+  .sf-test .rail *,
+  .sf-test .eyebrow,
+  .sf-test .eyebrow *,
+  .sf-test .tech,
+  .sf-test .tech *,
+  .sf-test .tool-run,
+  .sf-test .tool-run * {
+    font-family: var(--font-mono) !important;
+  }
+  .sf-test .tool-run,
+  .sf-test .tool-run * {
+    text-transform: uppercase !important;
+  }
+
+  /* Optical size: SF Pro's x-height is smaller than JetBrains Mono at the
+     same computed size. Measured in `ex` against the resolved fonts - a
+     canvas never resolves `-apple-system` and reports a fallback instead.
+     At 12px, Mono's x-height is 6.594px against SF Pro's 6.313px, a ratio
+     of 1.0446. `.meta` (org names, project year/role) was already on that
+     scale; roles and descriptions on /experience were not.
+
+     This matches height, not width. Mono is far wider - the same string
+     sets 223px in JetBrains Mono against 156px in SF Pro - and that
+     missing 30% of line length is most of why the sans still looks
+     lighter. No size can return it without making the text genuinely
+     bigger than the mono it replaced. */
+  .sf-test .meta {
+    font-size: calc(0.75rem * 1.0446);
+  }
+  .sf-test .exp-org {
+    font-size: calc(0.85rem * 1.0446);
+  }
+  .sf-test .exp-role {
+    font-size: calc(1.2rem * 1.0446);
+  }
+  .sf-test .exp-copy {
+    font-size: calc(0.975rem * 1.0446);
+  }
+
+  /* A whole row as one link. The tint is a pseudo-element bleeding past each
+     edge, so no negative margin pulls the hairlines out of alignment. */
+  .row-link {
+    position: relative;
+    /* Safari paints its own grey slab over a tapped link, which on rows this
+       large reads as a flash across half the screen. The `:active` tint below
+       is the replacement. */
+    -webkit-tap-highlight-color: transparent;
+  }
+  .row-link::before {
+    content: "";
+    position: absolute;
+    inset: 0 -0.75rem;
+    z-index: -1;
+    pointer-events: none;
+    background-color: transparent;
+    transition: background-color 0.18s var(--ease-authored);
+  }
+  /* Hover is a pointer idiom. A phone has no hover state to leave, so iOS
+     applies one on tap and holds it until the next tap somewhere else: the
+     row a reader just followed stays washed for as long as they are on the
+     page. `@media (hover: hover)` keeps the tint on pointers only - the same
+     gate Tailwind puts on its own `hover:` utilities - and `:active` gives
+     touch the press feedback that would otherwise be lost. */
+  .row-link:active::before,
+  .row-link:focus-within::before {
+    background-color: var(--color-paper-2);
+  }
+  @media (hover: hover) {
+    .row-link:hover::before {
+      background-color: var(--color-paper-2);
+    }
+  }
+  /* The row's link is a stretched overlay on a small icon, so the browser's
+     ring would land on the icon. Draw it on the row instead. */
+  .row-link:focus-within::before {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 0;
+  }
+  .row-link:focus-within :focus-visible {
+    outline: none;
+  }
+
+  /* Gives a link the row's full hit area. The row can't be an <a> because
+     some carry nested links; those sit above with `relative z-10`. */
+  .row-target::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Row icons (arrow, GitHub) are the only controls. Two steps: the row
+     darkens them from faint; hovering the icon itself goes to black and
+     thickens the stroke — the same jump on both marks. */
+  .row-icon {
+    color: var(--color-faint);
+    transition: color 0.2s var(--ease-authored);
+  }
+  .row-icon svg {
+    transition:
+      stroke-width 0.2s var(--ease-authored),
+      stroke 0.2s var(--ease-authored);
+    stroke-width: 1.75;
+  }
+  .row-link:focus-within .row-icon {
+    /* Midway: darker than faint, still clearly not black. */
+    color: #4a453f;
+  }
+  .row-link .row-icon:focus-visible,
+  .row-link .row-icon:active {
+    color: #000;
+  }
+  .row-link .row-icon:focus-visible svg[stroke],
+  .row-link .row-icon:active svg[stroke] {
+    stroke-width: 2.5;
+  }
+  /* GitHub has no `stroke` on the <svg> itself. Direct hover thickens
+     further than the arrow so the denser octocat still reads as a bite. */
+  .row-link .row-icon:focus-visible svg:not([stroke]),
+  .row-link .row-icon:active svg:not([stroke]) {
+    stroke-width: 3.5;
+  }
+  /* Same gate as the row tint: on a phone these would stick to whichever
+     icon was tapped last. */
+  @media (hover: hover) {
+    .row-link:hover .row-icon {
+      color: #4a453f;
+    }
+    .row-link .row-icon:hover {
+      color: #000;
+    }
+    .row-link .row-icon:hover svg[stroke] {
+      stroke-width: 2.5;
+    }
+    .row-link .row-icon:hover svg:not([stroke]) {
+      stroke-width: 3.5;
+    }
+  }
+
+  /* Standalone text links. Padding grows the hit area past 44px; the
+     matching negative margin gives the space back to the layout. */
+  .tap {
+    padding-block: 0.875rem;
+    margin-block: -0.875rem;
+    /* Horizontal too: "Email" is only 37px wide otherwise. 0.35rem a side
+       stays inside the 20px gap, so hit areas never overlap. */
+    padding-inline: 0.35rem;
+    margin-inline: -0.35rem;
+  }
+
+  .footer-link {
+    display: block;
+    /* 0.65rem, not 0.6: at 0.6 the row measures 43.5px and misses the 44px
+       touch guideline by half a pixel. The md override below drops it back
+       for pointer sizes. */
+    padding-block: 0.65rem;
+    font-size: 0.95rem;
+    color: var(--color-ink-2);
+    transition: color 0.2s var(--ease-authored);
+  }
+
+  .footer-mono {
+    font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  }
+  @media (hover: hover) {
+    .footer-link:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  /* The marks are aligned to ELSEWHERE’s glyph ink, not to boxes, so the
+     offsets below are measured constants at the footer’s type sizes. A 27px
+     drawing sits 10.24px inside its 44px hit box (8.5px of box padding plus
+     1.74px of viewBox margin around the 0.9 stroke); the eyebrow’s ink
+     starts 1.05px inside the column and ends 2.66px short of it, that gap
+     being its trailing letter-spacing and side bearing. The difference is
+     what each end box hangs out by. Nothing here changes the 27px mark or
+     the 44px hit target. Re-measure if the eyebrow’s size or tracking, or
+     the mark’s 24-unit viewBox, changes. */
+  .footer-social {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-social > :first-child {
+    margin-left: -9.19px;
+  }
+  .footer-social > :last-child {
+    margin-right: -7.59px;
+  }
+  /* Column width is the eyebrow’s, since the two hit boxes minus those
+     negative margins (71.2px) measure less than it. Free space lands
+     between the marks, which is why space-between doesn’t collapse. */
+
+  /* 20.85px of ink-to-ink air under the eyebrow, matching what “Kevin Mei”
+     keeps above “CS & Journalism | Northwestern” in the other column.
+     5.31px of that is the eyebrow’s own half-leading and 10.24px is the
+     mark’s inset, leaving this margin. */
+  .footer-social-label {
+    margin-bottom: 5.29px;
+  }
+
+  /* 44px box around a 27px mark, drawing centred: .footer-social positions
+     the pair, so the box no longer nudges the glyph to one side. */
+  .footer-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    color: var(--color-ink);
+    transition: color 0.2s var(--ease-authored);
+  }
+  /* Accent alone is still a dark burgundy, so a 0.9 stroke barely
+     lightens. Mix it toward paper so the outline actually fades. Hover is
+     gated for the same reason as the rows above; `:active` is what a phone
+     gets instead. */
+  .footer-icon:focus-visible,
+  .footer-icon:active {
+    color: color-mix(in srgb, var(--color-accent) 48%, var(--color-paper));
+  }
+  @media (hover: hover) {
+    .footer-icon:hover {
+      color: color-mix(in srgb, var(--color-accent) 48%, var(--color-paper));
+    }
+  }
+
+  @media (width >= 48rem) {
+    .footer-link {
+      padding-block: 0.25rem;
+    }
+  }
+}
+
+@media (prefers-contrast: more), (forced-colors: active) {
+  .page-title-gradient {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+/* Cross-page transition: a short cross-fade on the root. The reduced-motion
+   block below cancels it. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: var(--ease-authored);
+}
+
+/* The scroll-reveal ships opacity:0 in the server HTML and relies on the
+   client to clear it. Printing never scrolls, so force revealable elements
+   visible or the page prints blank. The no-JS equivalent is a <noscript>
+   block in layout.js. */
+@media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* /experience is already a chronological, rule-separated list, so on paper
+     it should just be a CV. Drop the chrome, force black on white, and keep a
+     role from splitting across a page break. */
+  header,
+  footer,
+  nav[aria-label="Sections"],
+  a[href="#main"] {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  article,
+  .row-link {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Hairlines survive most printers better as a solid grey than as a token. */
+  [class*="border-line"] {
+    border-color: #bbb !important;
+  }
+
+  /* Link URLs are useless on paper unless they're spelled out. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
