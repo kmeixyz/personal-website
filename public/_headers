@@ -1,0 +1,16 @@
+# Fallback security headers for static hosts (Netlify, Cloudflare Pages) that
+# serve the built output directly and never run next.config.mjs `headers()`.
+# Keep this in sync with the `securityHeaders` array in next.config.mjs — on
+# Vercel or any Node runtime that file is the one that applies and this is inert.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; media-src 'self'; worker-src 'none'; frame-ancestors 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; manifest-src 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), autoplay=(self), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-DNS-Prefetch-Control: off
+  X-Permitted-Cross-Domain-Policies: none
