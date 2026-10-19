@@ -1,0 +1,143 @@
+/* Apple-inspired refinements are confined to the Home route. */
+@layer components {
+  .home-redesign {
+    --home-title-start: #06263b;
+    --home-title-end: #4e718c;
+    --home-control-fill: #e9edf1;
+    --home-control-ink: #294b65;
+  }
+
+  /* Reserve gradients for the hero and larger section headlines.
+     Smaller card titles, roles, greetings, and footer labels keep solid ink. */
+  .home-redesign :is(.home-intro h1, .home-section h2, .home-highlights-heading h3, .home-contact-heading h2) {
+    color: #06263b;
+    width: fit-content;
+    max-width: 100%;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .home-redesign .home-intro h1 { letter-spacing: calc(-0.04em + 1px); }
+  .home-redesign .home-section h2,
+  .home-redesign .home-contact-heading h2 { letter-spacing: calc(-0.035em + 1px); }
+  .home-redesign .home-highlights-heading h3 { letter-spacing: calc(-0.03em + 1px); }
+  @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+    .home-redesign :is(.home-intro h1, .home-section h2, .home-highlights-heading h3, .home-contact-heading h2) {
+      background-image: linear-gradient(100deg, var(--home-title-start, #06263b) 0%, var(--home-title-end, #4e718c) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    /* The fill is transparent so the gradient shows through, which leaves
+       selected text as a faint ghost under the highlight. Selected, it goes
+       solid ink. */
+    .home-redesign :is(.home-intro h1, .home-section h2, .home-highlights-heading h3, .home-contact-heading h2)::selection {
+      -webkit-text-fill-color: #06263b;
+    }
+  }
+  .home-redesign .home-hello { margin-bottom: 20px; }
+  
+  .home-redesign .home-service h3 { margin-top: 0; }
+
+  /* A moving glass capsule, with the labels on a separate layer. */
+
+  
+
+  
+
+  
+
+  
+
+  /* Glass buttons: a translucent fill graded light-to-dark from the top, a
+     bright catch light along the upper edge, and a hairline rim, over a blur
+     of whatever sits behind - the page beside the toolkit heading, a card's
+     tint under the corner link and the capsule. One recipe, so the round
+     arrows and the capsule can't drift apart. */
+  .home-round-control, .home-capsule-link { color: var(--home-control-ink); background: linear-gradient(180deg, rgb(255 255 255 / 0.82), rgb(225 232 239 / 0.55)); border: 1px solid rgb(255 255 255 / 0.75); box-shadow: inset 0 1px 0 #fff, inset 0 -1px 1px rgb(41 75 101 / 0.07), 0 0 0 0.5px rgb(41 75 101 / 0.14), 0 6px 14px -9px rgb(40 58 89 / 0.4); -webkit-backdrop-filter: blur(14px) saturate(1.6); backdrop-filter: blur(14px) saturate(1.6); transition: background-color 180ms var(--lp-ease), box-shadow 180ms var(--lp-ease), transform 180ms var(--lp-ease); }
+  .home-round-control:hover:not(:disabled), .home-capsule-link:hover { background-color: rgb(255 255 255 / 0.5); box-shadow: inset 0 1px 0 #fff, inset 0 -1px 1px rgb(41 75 101 / 0.07), 0 0 0 0.5px rgb(41 75 101 / 0.2), 0 8px 18px -9px rgb(40 58 89 / 0.45); }
+  .home-capsule-link { display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 44px; padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 550; line-height: 1.4; }
+  .home-capsule-link svg { width: 16px; height: 16px; flex: none; }
+  .home-capsule-link:active { transform: scale(0.98); }
+  /* Rounded inset rows keep the employment history visible and easy to scan. */
+
+  
+  
+  .home-service { border-radius: 28px; }
+  
+  .home-redesign .lp-btn--primary { box-shadow: 0 4px 10px -5px rgb(30 77 150 / 0.4); }
+  .home-redesign .lp-panel { border-radius: 30px; }
+  .home-contact-heading p { text-wrap: pretty; }
+
+  /* A swipeable highlight gallery, as in the supplied Apple recording.
+     All cards remain in the DOM; scrolling is native and never automatic. */
+  .home-highlights { margin-top: 64px; }
+  .home-highlights-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 24px; }
+  .home-highlights-heading h3 { font-size: 34px; font-weight: 550; letter-spacing: -0.03em; line-height: 1.12; }
+  .home-highlights-heading p { font-size: 16px; color: var(--lp-muted); margin-top: 12px; }
+  .home-gallery-controls { display: flex; gap: 12px; flex: none; }
+  .home-round-control { width: 44px; height: 44px; display: inline-flex; justify-content: center; align-items: center; flex: none; border-radius: 50%; }
+  .home-round-control svg { width: 20px; height: 20px; }
+  .home-arrow-back { transform: rotate(180deg); }
+  .home-round-control:active:not(:disabled) { transform: scale(0.93); }
+  .home-round-control:disabled { color: #a1aab2; background: rgb(240 241 242 / 0.6); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(41 75 101 / 0.08); cursor: default; }
+  .home-highlight-rail { display: grid; grid-auto-flow: column; grid-auto-columns: 43%; gap: 20px; position: relative; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: #b9c6d1 transparent; padding: 4px 2px 18px; }
+  /* The same glass at card size: each category keeps its tint, washed with
+     white towards the top-left where the light lands. The shadow's spread
+     cancels its blur sideways, so the rail's overflow doesn't crop it. */
+  .home-highlight-card { --card-tint: rgb(238 242 245 / 0.78); display: flex; flex-direction: column; align-items: flex-start; min-width: 0; scroll-snap-align: start; border-radius: 28px; padding: 30px; background: linear-gradient(160deg, rgb(255 255 255 / 0.45), rgb(255 255 255 / 0) 50%), var(--card-tint); border: 1px solid rgb(255 255 255 / 0.7); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 -1px 0 rgb(40 58 89 / 0.05), 0 0 0 0.5px rgb(40 58 89 / 0.08), 0 14px 24px -24px rgb(40 58 89 / 0.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); backdrop-filter: blur(20px) saturate(1.5); }
+  .home-highlight-card[data-category="Cybersecurity"] { --card-tint: rgb(226 237 248 / 0.9); }
+  .home-highlight-card[data-category="Game Dev"] { --card-tint: rgb(227 240 229 / 0.9); }
+  .home-highlight-card[data-category="AI"] { --card-tint: rgb(240 233 247 / 0.9); }
+  .home-highlight-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; align-self: stretch; min-height: 44px; margin-block: -12px; }
+  .home-live-link svg { width: 18px; height: 18px; }
+  .home-highlight-category { font-size: 13px; color: #546879; font-weight: 500; }
+  .home-highlight-card h4 { font-size: 29px; line-height: 1.15; font-weight: 550; letter-spacing: -0.03em; margin-top: 16px; max-width: 19ch; }
+  .home-highlight-copy { font-size: 16px; line-height: 1.6; color: var(--lp-muted); margin-top: 18px; text-wrap: pretty; }
+  .home-highlight-copy strong { font-weight: 550; color: #213e54; }
+  .home-highlight-stack { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 24px 0; margin-top: auto; }
+  .home-highlight-stack li { font-size: 12px; line-height: 1.4; padding: 6px 10px; border-radius: 7px; color: #3d566a; background: rgb(255 255 255 / 0.7); }
+  .home-highlight-card .home-capsule-link { font-size: 13px; }
+  .home-highlight-card--no-stack .home-capsule-link { margin-top: auto; }
+
+  @media (max-width: 767px) {
+    
+    .home-redesign .home-hello { margin-bottom: 16px; }
+
+    .home-highlights { margin-top: 44px; }
+    .home-highlights-heading { align-items: flex-start; gap: 12px; }
+    .home-highlights-heading h3 { font-size: 28px; }
+    .home-highlights-heading p { max-width: 23ch; font-size: 14px; }
+    .home-gallery-controls { gap: 6px; }
+    .home-highlight-rail { grid-auto-columns: 88%; gap: 14px; }
+    .home-highlight-card { padding: 24px; border-radius: 24px; }
+    .home-highlight-card h4 { font-size: 26px; }
+    .home-highlight-copy { font-size: 15px; }
+    .home-contact-actions .lp-copy { border-radius: 18px; padding-block: 10px; }
+    .home-contact-actions .lp-copy__text { white-space: normal; overflow-wrap: anywhere; text-align: left; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    
+    @keyframes home-panel-in { from { opacity: 0.65; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .home-redesign .home-glass, .home-redesign .lp-panel { background: #f5f7fa; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .home-round-control, .home-capsule-link { background: var(--home-control-fill); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .home-capsule-link { border-color: #a8b5c2; }
+    .home-highlight-card { background: #eef2f5; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .home-highlight-card[data-category="Cybersecurity"] { background: #e7eff8; }
+    .home-highlight-card[data-category="Game Dev"] { background: #e8f1e9; }
+    .home-highlight-card[data-category="AI"] { background: #f1ebf7; }
+
+  }
+  @media (forced-colors: active), (prefers-contrast: more) {
+    .home-redesign :is(h1, h2, h3, h4, h5, h6), .home-redesign .home-hello, body:has(.home-redesign) footer :is(h2, h3) { background: none; -webkit-text-fill-color: currentColor; color: CanvasText; }
+    
+    .home-round-control, .home-capsule-link { border: 1px solid ButtonText; }
+  }
+  @media print {
+    .home-redesign :is(h1, h2, h3, h4, h5, h6), .home-redesign .home-hello { background: none; -webkit-text-fill-color: #000; color: #000; }
+    .home-highlight-rail { display: block; overflow: visible; }
+    .home-highlight-card { margin-bottom: 20px; break-inside: avoid; }
+    .home-gallery-controls { display: none; }
+  }
+}
